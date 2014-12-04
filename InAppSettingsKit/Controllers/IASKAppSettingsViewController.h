@@ -20,6 +20,7 @@
 #import "IASKSettingsStore.h"
 #import "IASKViewController.h"
 #import "IASKSpecifier.h"
+#import "IASKViewAttributes.h"
 
 @class IASKSettingsReader;
 @class IASKAppSettingsViewController;
@@ -68,6 +69,7 @@
 @property (nonatomic, retain) NSSet *hiddenKeys;
 @property (nonatomic) IBInspectable BOOL neverShowPrivacySettings;
 
++ (void)setViewAttributes:(IASKViewAttributes *)attrs;
 - (void)synchronizeSettings;
 - (void)dismiss:(id)sender;
 - (void)setHiddenKeys:(NSSet*)hiddenKeys animated:(BOOL)animated;

@@ -34,9 +34,16 @@
 @synthesize settingsReader = _settingsReader;
 @synthesize settingsStore = _settingsStore;
 
+static IASKViewAttributes *ConfigAttrs;
+
 - (void)setSettingsStore:(id <IASKSettingsStore>)settingsStore {
     _settingsStore = settingsStore;
     _selection.settingsStore = settingsStore;
+}
+
++ (void)setViewAttributes:(IASKViewAttributes *)attrs
+{
+    ConfigAttrs = attrs;
 }
 
 - (void)loadView
@@ -60,6 +67,10 @@
         _selection.specifier = _currentSpecifier;
     }
     
+    if (ConfigAttrs) {
+        _tableView.separatorColor = ConfigAttrs.separatorColor;
+        _tableView.backgroundColor = ConfigAttrs.tableViewBackgroundColor;
+    }
     if (_tableView) {
         [_tableView reloadData];
 
@@ -90,6 +101,14 @@
 #pragma mark -
 #pragma mark UITableView delegates
 
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (ConfigAttrs) {
+        return ConfigAttrs.rowHeight;
+    }
+    return 44;
+}
+
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
 	return 1;
 }
@@ -108,6 +127,12 @@
 	
     if (!cell) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:kCellValue];
+    }
+    if (ConfigAttrs) {
+        cell.backgroundColor = ConfigAttrs.tableViewCellBackgroundColor;
+        cell.selectedBackgroundView = ConfigAttrs.tableViewCellSelectedBackgroundView;
+        cell.textLabel.textColor = ConfigAttrs.tableViewCellTextLabelColor;
+        cell.detailTextLabel.textColor = ConfigAttrs.tableViewCellDetailTextLabelColor;
     }
 
     [_selection updateSelectionInCell:cell indexPath:indexPath];

@@ -17,6 +17,7 @@
 #import <UIKit/UIKit.h>
 #import "IASKSettingsStore.h"
 #import "IASKViewController.h"
+#import "IASKViewAttributes.h"
 @class IASKSpecifier;
 @class IASKSettingsReader;
 
@@ -29,5 +30,7 @@
 
 @property (nonatomic, retain) UITableView *tableView;
 @property (nonatomic, retain) IASKSpecifier *currentSpecifier;
+
++ (void)setViewAttributes:(IASKViewAttributes *)attrs;
 
 @end

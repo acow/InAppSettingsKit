@@ -39,6 +39,7 @@ static NSString *kIASKCredits = @"Powered by InAppSettingsKit"; // Leave this as
 #define kIASKCreditsViewWidth                         285
 
 CGRect IASKCGRectSwap(CGRect rect);
+static IASKViewAttributes *ConfigAttrs;
 
 @interface IASKAppSettingsViewController () {
     IASKSettingsReader		*_settingsReader;
@@ -99,6 +100,11 @@ CGRect IASKCGRectSwap(CGRect rect);
 		[self.tableView reloadData];
 		[self createSelections];
 	}
+}
+
++ (void)setViewAttributes:(IASKViewAttributes *)attrs;
+{
+    ConfigAttrs = attrs;
 }
 
 - (void)createSelections {
@@ -196,6 +202,11 @@ CGRect IASKCGRectSwap(CGRect rect);
 		[dc addObserver:self selector:@selector(didChangeSettingViaIASK:) name:kIASKAppSettingChanged object:nil];
 		[self userDefaultsDidChange]; // force update in case of changes while we were hidden
 	}
+    
+    if (ConfigAttrs) {
+        self.tableView.separatorColor = ConfigAttrs.separatorColor;
+        self.tableView.backgroundColor = ConfigAttrs.tableViewBackgroundColor;
+    }
 	[super viewWillAppear:animated];
 }
 
@@ -403,6 +414,9 @@ CGRect IASKCGRectSwap(CGRect rect);
 			return 0;
 		}
 	}
+    if (ConfigAttrs) {
+        return ConfigAttrs.rowHeight;
+    }
 	IASK_IF_IOS7_OR_GREATER
 	(
 	 NSDictionary *rowHeights = @{UIContentSizeCategoryExtraSmall: @(44),
@@ -498,11 +512,22 @@ CGRect IASKCGRectSwap(CGRect rect);
 	return cell;
 }
 
+- (void)configCell:(UITableViewCell *)cell
+{
+    if (ConfigAttrs) {
+        cell.backgroundColor = ConfigAttrs.tableViewCellBackgroundColor;
+        cell.selectedBackgroundView = ConfigAttrs.tableViewCellSelectedBackgroundView;
+        cell.textLabel.textColor = ConfigAttrs.tableViewCellTextLabelColor;
+        cell.detailTextLabel.textColor = ConfigAttrs.tableViewCellDetailTextLabelColor;
+    }
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 	IASKSpecifier *specifier  = [self.settingsReader specifierForIndexPath:indexPath];
 	if ([specifier.type isEqualToString:kIASKCustomViewSpecifier] && [self.delegate respondsToSelector:@selector(tableView:cellForSpecifier:)]) {
 		UITableViewCell* cell = [self.delegate tableView:tableView cellForSpecifier:specifier];
 		assert(nil != cell && "delegate must return a UITableViewCell for custom cell types");
+        [self configCell:cell];
 		return cell;
 	}
 	
@@ -620,6 +645,7 @@ CGRect IASKCGRectSwap(CGRect rect);
 	cell.detailTextLabel.textAlignment = specifier.textAlignment;
 	cell.textLabel.adjustsFontSizeToFitWidth = specifier.adjustsFontSizeToFitWidth;
 	cell.detailTextLabel.adjustsFontSizeToFitWidth = specifier.adjustsFontSizeToFitWidth;
+    [self configCell:cell];
     return cell;
 }
 
@@ -650,6 +676,7 @@ CGRect IASKCGRectSwap(CGRect rect);
         [targetViewController setCurrentSpecifier:specifier];
         targetViewController.settingsReader = self.settingsReader;
         targetViewController.settingsStore = self.settingsStore;
+        [IASKSpecifierValuesViewController setViewAttributes:ConfigAttrs];
 		IASK_IF_IOS7_OR_GREATER(targetViewController.view.tintColor = self.view.tintColor;)
         _currentChildViewController = targetViewController;
         [[self navigationController] pushViewController:targetViewController animated:YES];
