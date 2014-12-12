@@ -1,4 +1,5 @@
 #import <UIKit/UIKit.h>
+#import "IASKViewAttributes.h"
 
 @class IASKSpecifier;
 @protocol IASKSettingsStore;
@@ -15,5 +16,7 @@
 
 - (void)selectRowAtIndexPath:(NSIndexPath *)indexPath;
 - (void)updateSelectionInCell:(UITableViewCell *)cell indexPath:(NSIndexPath *)indexPath;
+
++ (void)setViewAttributes:(IASKViewAttributes *)attrs;
 
 @end

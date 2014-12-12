@@ -17,6 +17,7 @@
         self.rowHeight = 44;
         self.separatorColor = [UITableView appearance].separatorColor;
         self.tableViewBackgroundColor = [UIColor groupTableViewBackgroundColor];
+        self.tableViewContentInset = UIEdgeInsetsZero;
         self.tableViewCellBackgroundColor = [UITableViewCell appearance].backgroundColor;
         self.tableViewCellSelectedBackgroundView = [UITableViewCell appearance].selectedBackgroundView;
         self.tableViewCellTextLabelColor = [UIColor darkTextColor];

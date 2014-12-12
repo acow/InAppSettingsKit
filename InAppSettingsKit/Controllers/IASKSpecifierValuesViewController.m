@@ -70,6 +70,7 @@ static IASKViewAttributes *ConfigAttrs;
     if (ConfigAttrs) {
         _tableView.separatorColor = ConfigAttrs.separatorColor;
         _tableView.backgroundColor = ConfigAttrs.tableViewBackgroundColor;
+        _tableView.contentInset = ConfigAttrs.tableViewContentInset;
     }
     if (_tableView) {
         [_tableView reloadData];

@@ -9,6 +9,13 @@
     NSInteger _checkedIndex;
 }
 
+static IASKViewAttributes *ConfigAttrs;
+
++ (void)setViewAttributes:(IASKViewAttributes *)attrs
+{
+    ConfigAttrs = attrs;
+}
+
 - (instancetype)init {
     self = [super init];
     if (self) {
@@ -83,12 +90,18 @@
 }
 
 - (void)selectCell:(UITableViewCell *)cell {
-    [cell setAccessoryType:UITableViewCellAccessoryCheckmark];
+    if (ConfigAttrs.tableViewCellAccessoryCheckmark) {
+        UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:ConfigAttrs.tableViewCellAccessoryCheckmark]];
+        cell.accessoryView = imageView;
+    } else {
+        [cell setAccessoryType:UITableViewCellAccessoryCheckmark];
+    }
     IASK_IF_PRE_IOS7([[cell textLabel] setTextColor:kIASKgrayBlueColor];);
 }
 
 - (void)deselectCell:(UITableViewCell *)cell {
     [cell setAccessoryType:UITableViewCellAccessoryNone];
+    cell.accessoryView = nil;
     IASK_IF_PRE_IOS7([[cell textLabel] setTextColor:[UIColor darkTextColor]];);
 }
 

@@ -105,6 +105,8 @@ static IASKViewAttributes *ConfigAttrs;
 + (void)setViewAttributes:(IASKViewAttributes *)attrs;
 {
     ConfigAttrs = attrs;
+    [IASKSpecifierValuesViewController setViewAttributes:ConfigAttrs];
+    [IASKMultipleValueSelection setViewAttributes:ConfigAttrs];
 }
 
 - (void)createSelections {
@@ -206,6 +208,7 @@ static IASKViewAttributes *ConfigAttrs;
     if (ConfigAttrs) {
         self.tableView.separatorColor = ConfigAttrs.separatorColor;
         self.tableView.backgroundColor = ConfigAttrs.tableViewBackgroundColor;
+        self.tableView.contentInset = ConfigAttrs.tableViewContentInset;
     }
 	[super viewWillAppear:animated];
 }
@@ -485,6 +488,10 @@ static IASKViewAttributes *ConfigAttrs;
 	else if ([identifier isEqualToString:kIASKPSMultiValueSpecifier] || [identifier isEqualToString:kIASKPSTitleValueSpecifier]) {
 		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
 		cell.accessoryType = [identifier isEqualToString:kIASKPSMultiValueSpecifier] ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
+        if (ConfigAttrs.tableViewCellAccessoryViewMultiValue && [identifier isEqualToString:kIASKPSMultiValueSpecifier]) {
+            UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:ConfigAttrs.tableViewCellAccessoryViewMultiValue]];
+            cell.accessoryView = imageView;
+        }
 	}
 	else if ([identifier isEqualToString:kIASKPSTextFieldSpecifier]) {
 		cell = [[IASKPSTextFieldSpecifierViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:kIASKPSTextFieldSpecifier];
@@ -494,7 +501,12 @@ static IASKViewAttributes *ConfigAttrs;
         cell = [[IASKPSSliderSpecifierViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:kIASKPSSliderSpecifier];
 	} else if ([identifier isEqualToString:kIASKPSChildPaneSpecifier]) {
 		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
-		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        if (ConfigAttrs.tableViewCellAccessoryViewChildPane) {
+            UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:ConfigAttrs.tableViewCellAccessoryViewChildPane]];
+            cell.accessoryView = imageView;
+        } else {
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        }
 	} else if ([identifier isEqualToString:kIASKMailComposeSpecifier]) {
 		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
 		[cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
@@ -502,7 +514,12 @@ static IASKViewAttributes *ConfigAttrs;
 		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier];
 
 		if ([identifier isEqualToString:kIASKOpenURLSpecifier]) {
-			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            if (ConfigAttrs.tableViewCellAccessoryViewOpenURL) {
+                UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:ConfigAttrs.tableViewCellAccessoryViewOpenURL]];
+                cell.accessoryView = imageView;
+            } else {
+                cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            }
 		}
 	}
 	IASK_IF_PRE_IOS6(cell.textLabel.minimumFontSize = kIASKMinimumFontSize;
@@ -628,6 +645,10 @@ static IASKViewAttributes *ConfigAttrs;
 			cell.textLabel.textColor = tableView.tintColor;
 		}
 		cell.accessoryType = (specifier.textAlignment == NSTextAlignmentLeft) ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
+        if (ConfigAttrs.tableViewCellAccessoryViewButton) {
+            UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:ConfigAttrs.tableViewCellAccessoryViewButton]];
+            cell.accessoryView = imageView;
+        }
 	} else if ([specifier.type isEqualToString:kIASKPSRadioGroupSpecifier]) {
 		NSInteger index = [specifier.multipleValues indexOfObject:specifier.radioGroupValue];
 		cell.textLabel.text = [self.settingsReader titleForStringId:specifier.multipleTitles[index]];
@@ -676,7 +697,6 @@ static IASKViewAttributes *ConfigAttrs;
         [targetViewController setCurrentSpecifier:specifier];
         targetViewController.settingsReader = self.settingsReader;
         targetViewController.settingsStore = self.settingsStore;
-        [IASKSpecifierValuesViewController setViewAttributes:ConfigAttrs];
 		IASK_IF_IOS7_OR_GREATER(targetViewController.view.tintColor = self.view.tintColor;)
         _currentChildViewController = targetViewController;
         [[self navigationController] pushViewController:targetViewController animated:YES];
